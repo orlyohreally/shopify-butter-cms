@@ -17,8 +17,20 @@ var ShopifyService = {
     console.log(this);
     return this.shops[shopName];
   },
-  getOrders: function (shop) {
-    return shop;
+  getProducts: function (shop) {
+    var shopify = new shopifyAPI({
+      shopName: shop.config.shop,
+      accessToken: shop.config.access_token,
+    });
+
+    return shopify.product.list();
+  },
+  createPage(shop, pageOptions) {
+    var shopify = new shopifyAPI({
+      shopName: shop.config.shop,
+      accessToken: shop.config.access_token,
+    });
+    return shopify.page.create(pageOptions);
   },
 };
 
