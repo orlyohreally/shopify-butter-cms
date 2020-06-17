@@ -10,16 +10,16 @@ export class ConfigFormComponent implements OnInit {
   form: FormGroup;
   submittingForm = false;
   errorMessage: string;
+  tokenLength = 40;
 
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
     this.form = new FormGroup({
-      // FIXME: not commit with 'a'.repeat(40)
-      butterCMSWriteToken: new FormControl('a'.repeat(40), [
+      butterCMSWriteToken: new FormControl('', [
         Validators.required,
-        Validators.minLength(40),
-        Validators.maxLength(40),
+        Validators.minLength(this.tokenLength),
+        Validators.maxLength(this.tokenLength),
       ]),
     });
   }
@@ -29,12 +29,12 @@ export class ConfigFormComponent implements OnInit {
   }
 
   submitForm() {
-    console.log(this.form.value, this.form.valid);
     if (!this.form.valid) {
       this.form.markAsTouched();
       return;
     }
     this.submittingForm = true;
+    this.errorMessage = '';
     this.apiService.configApp(this.form.value).subscribe(
       () => {
         console.log('yey');

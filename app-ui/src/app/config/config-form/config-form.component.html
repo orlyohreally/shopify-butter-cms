@@ -14,7 +14,11 @@
       cdkFocusInitial
       formControlName="butterCMSWriteToken"
       name="write-token"
+      maxlength="40"
     />
+    <mat-hint align="end">
+      {{ butterCMSWriteToken.value.length }} / {{ tokenLength }}
+    </mat-hint>
     <mat-error *ngIf="butterCMSWriteToken.hasError('required')">
       Provide token
     </mat-error>
