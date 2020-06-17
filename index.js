@@ -3,7 +3,7 @@ var nonce = require("nonce")();
 var express = require("express");
 var bodyParser = require("body-parser");
 var path = require("path");
-
+var checkHmacValidity = require("shopify-hmac-validation").checkHmacValidity;
 var shopifyService = require("./services/shopify-service");
 var butterCMSService = require("./services/butter-cms-service");
 
@@ -17,15 +17,19 @@ var appConfig = {
 
 function verifyRequest(req, res, next) {
   try {
+    if (!checkHmacValidity(appConfig.apiSecret, req.query)) {
+      throw "Unauthorized";
+    }
+
     var shop = shopifyService.getShop(req.query.shop);
     if (!shop) {
-      throw new Error("No shop provided");
+      throw new Error("Shop not found");
     }
     res.locals.shop = shop;
-    console.log({ shop: shop });
     next();
   } catch (e) {
-    return res.status(400).send("Something went wrong");
+    console.log(e);
+    return res.status(400).send("Unauthorized");
   }
 }
 
@@ -70,37 +74,36 @@ app.get("/shopify/callback", function (req, res) {
   }
 });
 
-app.get("/", function (req, res) {
-  var shop = shopifyService.getShop(req.query.shop);
-  if (!shop) {
-    throw new Error("No shop provided");
-  }
+app.use(express.static(path.join(__dirname, "/dist/app-ui")));
 
-  return res.status(200).sendFile(path.join(__dirname, "/index.html"));
+app.get("/*", verifyRequest, function (req, res) {
+  res.sendFile(path.join(__dirname, "/dist/app-ui/index.html"));
 });
 
-app.post("/butter-cms/config", verifyRequest, function (req, res) {
-  console.log(req.body);
+app.post("/app/butter-cms/config", verifyRequest, function (req, res) {
   try {
-    var butterCMSId = req.body.butterCMSId;
-    var shop = res.locals.shop;
+    var butterCMSId = req.body.config.butterCMSWriteToken;
+    // var shop = res.locals.shop;
 
     if (!butterCMSId) {
       return res.status(404).send("butterCMSId is missing");
     }
     butterCMSService.init(butterCMSId);
-    shopifyService.getProducts(shop).then(function (result1) {
-      shopifyService
-        .createPage(shop, {
-          title: "Warranty information",
-          body_html:
-            "<h2>Warranty</h2>\n<p>Returns accepted if we receive items <strong>30 days after purchase</strong>.</p>",
-        })
-        .then(function (result) {
-          console.log({ res: result });
-          return res.status(200).json("Created!");
-        });
-    });
+    res
+      .status(200)
+      .json({ message: "Configurations have been successfully saved" });
+    // shopifyService.getProducts(shop).then(function (result1) {
+    //   shopifyService
+    //     .createPage(shop, {
+    //       title: "Warranty information",
+    //       body_html:
+    //         "<h2>Warranty</h2>\n<p>Returns accepted if we receive items <strong>30 days after purchase</strong>.</p>",
+    //     })
+    //     .then(function (result) {
+    //       console.log({ res: result });
+    //       return res.status(200).json("Created!");
+    //     });
+    // });
   } catch (e) {
     console.log(e);
     return res.status(400).send("Something went wrong");

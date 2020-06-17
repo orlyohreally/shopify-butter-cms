@@ -1,0 +1,22 @@
+<mat-drawer-container class="example-container">
+  <mat-drawer mode="side" opened>
+    <mat-list role="list">
+      <mat-list-item role="listitem">
+        <a routerLink="/categories">Categories</a>
+      </mat-list-item>
+      <mat-list-item role="listitem">
+        <a routerLink="/config">Configurations</a>
+      </mat-list-item>
+    </mat-list>
+  </mat-drawer>
+  <mat-drawer-content>
+    <mat-toolbar color="primary">
+      <mat-toolbar-row>
+        <span>{{ title }}</span>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

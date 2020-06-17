@@ -25,7 +25,7 @@ var ShopifyService = {
 
     return shopify.product.list();
   },
-  createPage(shop, pageOptions) {
+  createPage: function (shop, pageOptions) {
     var shopify = new shopifyAPI({
       shopName: shop.config.shop,
       accessToken: shop.config.access_token,
