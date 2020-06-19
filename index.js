@@ -1,12 +1,13 @@
 require("dotenv").config();
-var requestPromise = require("request-promise");
 var nonce = require("nonce")();
 var express = require("express");
 var bodyParser = require("body-parser");
 var path = require("path");
+
 var checkHmacValidity = require("shopify-hmac-validation").checkHmacValidity;
 var shopifyService = require("./services/shopify-service");
 var butterCMSService = require("./services/butter-cms-service");
+var utils = require("./utils");
 
 var forwardingAddress = process.env.APP_URL;
 var appConfig = {
@@ -17,6 +18,7 @@ var appConfig = {
 };
 
 function verifyRequest(req, res, next) {
+  // FIXME: allow to ignore some query params and verify also props in post requests maybe
   try {
     if (!checkHmacValidity(appConfig.apiSecret, req.query)) {
       throw "Unauthorized";
@@ -143,8 +145,12 @@ app.post("/app/butter-cms/promotional-page", verifyRequest, function (
 ) {
   try {
     var slug = req.body.slug;
+    var template = req.body.template;
     if (!slug) {
       return res.status(400).send("slug is missing");
+    }
+    if (!template) {
+      return res.status(400).send("template is missing");
     }
     var shop = res.locals.shop;
     var shopName = shop.config.shop;
@@ -157,19 +163,10 @@ app.post("/app/butter-cms/promotional-page", verifyRequest, function (
         if (!page.data) {
           throw Error("Page not found");
         }
+        var pageHtml = utils.fillTemplate(template, page.data);
         return shopifyService.createPage(shop, {
           title: page.data.fields.seo.title,
-          body_html:
-            "<h1>" +
-            page.data.fields.twitter_card.title +
-            "</h1>" +
-            "<p>" +
-            page.data.fields.twitter_card.Description +
-            "</p>" +
-            "<img src='" +
-            page.data.fields.twitter_card.image +
-            "' />" +
-            generatePageFromProducts(page.data.fields.products),
+          body_html: pageHtml,
           slug: page.data.slug,
         });
       })
