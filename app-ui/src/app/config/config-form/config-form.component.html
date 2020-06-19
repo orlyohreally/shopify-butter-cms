@@ -34,7 +34,8 @@
   <div sharedNotificationBlock="error" *ngIf="errorMessage">
     {{ errorMessage }}
   </div>
-  <mat-progress-spinner *ngIf="submittingForm"> </mat-progress-spinner>
+  <mat-spinner *ngIf="submittingForm" [diameter]="30" color="primary">
+  </mat-spinner>
   <button mat-raised-button class="button" color="accent" type="submit">
     Save
   </button>

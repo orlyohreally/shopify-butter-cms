@@ -5,14 +5,30 @@ import { ConfigFormComponent } from './config/config-form/config-form.component'
 const routes: Routes = [
   { path: 'config', component: ConfigFormComponent },
   {
-    path: 'categories',
+    path: 'collections',
     loadChildren: () =>
-      import('./categories/categories.module').then((m) => m.CategoriesModule),
+      import('./collections/collections.module').then(
+        (m) => m.CollectionsModule
+      ),
   },
   {
     path: '',
     pathMatch: 'full',
     redirectTo: 'config',
+  },
+  {
+    path: 'collections',
+    loadChildren: () =>
+      import('./collections/collections.module').then(
+        (m) => m.CollectionsModule
+      ),
+  },
+  {
+    path: 'promotional-pages',
+    loadChildren: () =>
+      import('./promotional-pages/promotional-pages.module').then(
+        (m) => m.PromotionalPagesModule
+      ),
   },
 ];
 

@@ -19,6 +19,8 @@
     "express": "^4.17.1",
     "json-stable-stringify": "^1.0.1",
     "nonce": "^1.0.4",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5",
     "shopify-api-node": "^3.3.2",
     "shopify-hmac-validation": "^1.0.4",
     "shopify-node-api": "^1.11.1"

@@ -1,0 +1,50 @@
+<div>
+  <h1>Collections</h1>
+  <div
+    *ngIf="collections | async as collectionsList; else loading"
+    class="table__wrapper"
+  >
+    <table mat-table [dataSource]="collectionsList" class="mat-elevation-z8">
+      <ng-container matColumnDef="image">
+        <th mat-header-cell *matHeaderCellDef>Image</th>
+        <td mat-cell *matCellDef="let element">
+          <img
+            mat-card-image
+            [src]="element.image.src"
+            [alt]="element.image.alt"
+            class="collection__image"
+          />
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Title</th>
+        <td mat-cell *matCellDef="let element">{{ element.title }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <td mat-cell *matCellDef="let element">
+          <div [innerHTML]="element.body_html"></div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let element">
+          <div>
+            <button mat-raised-button (click)="createPage(element)">
+              Create page
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+  <ng-template #loading>
+    <mat-spinner color="primary"></mat-spinner>
+  </ng-template>
+</div>
