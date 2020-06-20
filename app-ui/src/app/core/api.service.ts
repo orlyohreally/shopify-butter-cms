@@ -48,25 +48,13 @@ export class ApiService {
     });
   }
 
-  createPageFromButterCMSPage(slug: string): Observable<void> {
+  createPageFromButterCMSPage(
+    slug: string,
+    template: string
+  ): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/butter-cms/promotional-page/`, {
       slug,
-      template: `
-        <h1>{{fields.twitter_card.title}}</h1>
-        <img style="max=width: 100%" src="{{fields.twitter_card.image}}"/>
-        <p>{{fields.twitter_card.Description}}</p>
-        <h2>
-        {{fields.product_promo_banner.headline}}
-        </h2>
-        <div style="display: flex; flex-wrap: wrap; justify-content: space-between">
-        {{#fields.product_promo_banner.product}}
-        <div style="flex:1; padding: 10px">
-        <a href="/collections/all/products/{{name}}">{{name}}</a>
-        <img style="width: 100%" src="{{image}}"/>
-        <p>{{description}}</p>
-        </div>
-        {{/fields.product_promo_banner.product}}
-        </div>`,
+      template,
     });
   }
 }

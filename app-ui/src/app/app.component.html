@@ -1,14 +1,10 @@
-<mat-drawer-container class="example-container">
-  <mat-drawer mode="side" opened>
+<mat-drawer-container>
+  <mat-drawer mode="side" opened color="prime">
+    <mat-icon class="icon">store</mat-icon>
     <mat-list role="list">
       <mat-list-item role="listitem">
         <a [routerLink]="['/promotional-pages']" queryParamsHandling="preserve">
           Promotional pages in ButterCMS
-        </a>
-      </mat-list-item>
-      <mat-list-item role="listitem">
-        <a [routerLink]="['/collections']" queryParamsHandling="preserve">
-          Collections
         </a>
       </mat-list-item>
       <mat-list-item role="listitem">

@@ -1,3 +1,5 @@
+@import "theme";
+
 .mat-drawer-container {
   height: 100%;
 }
@@ -21,4 +23,24 @@
 
 .mat-toolbar-row {
   height: 100%;
+}
+
+.icon {
+  height: 150px;
+  width: 150px;
+  font-size: 150px;
+}
+
+.mat-list-item {
+  font-weight: bold !important;
+  padding: 0 16px !important;
+  border-bottom: 1px solid rgba(mat-color($primary, 100), 0.3) !important;
+}
+
+.mat-list-item:last-child {
+  border-bottom: none !important;
+}
+
+.mat-list-item .mat-icon {
+  margin-right: 8px !important;
 }

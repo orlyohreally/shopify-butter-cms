@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfigModule } from './config/config.module';
 import { UrlQueryInterceptor } from './core/url-query.interceptor';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [AppComponent],
@@ -19,6 +20,7 @@ import { UrlQueryInterceptor } from './core/url-query.interceptor';
     AppRoutingModule,
     MatSidenavModule,
     BrowserAnimationsModule,
+    MatIconModule,
     MatToolbarModule,
     MatListModule,
     ConfigModule,
