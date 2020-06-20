@@ -3,9 +3,11 @@ var requestPromise = require("request-promise");
 
 var ButterCMSService = {
   configs: {},
-  butter: {},
-  init: function (shopName, configs) {
+  connect: function (shopName, configs) {
     this.configs[shopName] = configs;
+  },
+  disconnect: function (shopName) {
+    delete this.configs[shopName];
   },
   createPage: function (shopName, pageBody) {
     var options = {
@@ -53,6 +55,9 @@ var ButterCMSService = {
     });
   },
   addItemToCollection: function (shopName, collectionName, item) {
+    if (!this.configs[shopName] || !this.configs[shopName].writeToken) {
+      return Promise.resolve("No write-enabled token configured");
+    }
     var butter = butterCMS(this.configs[shopName].writeToken);
     var body = {
       key: "products",
@@ -85,8 +90,9 @@ var ButterCMSService = {
         }
         return;
       })
-      .catch(function (resp) {
-        console.log("error", resp);
+      .catch(function (error) {
+        console.log("error", error);
+        throw error;
       });
   },
 };

@@ -4,7 +4,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var path = require("path");
 
-var checkHmacValidity = require("shopify-hmac-validation").checkHmacValidity;
+var hmacValidity = require("shopify-hmac-validation");
 var shopifyService = require("./services/shopify-service");
 var butterCMSService = require("./services/butter-cms-service");
 var utils = require("./utils");
@@ -20,7 +20,7 @@ var appConfig = {
 function verifyRequest(req, res, next) {
   // FIXME: allow to ignore some query params and verify also props in post requests maybe
   try {
-    if (!checkHmacValidity(appConfig.apiSecret, req.query)) {
+    if (!hmacValidity.checkHmacValidity(appConfig.apiSecret, req.query)) {
       throw "Unauthorized";
     }
 
@@ -36,7 +36,42 @@ function verifyRequest(req, res, next) {
   }
 }
 
+function verifyWebhookRequest(req, res, next) {
+  try {
+    if (
+      !hmacValidity.checkWebhookHmacValidity(
+        appConfig.apiSecret,
+        req.rawBody,
+        req.headers["x-shopify-hmac-sha256"]
+      )
+    ) {
+      throw "Unauthorized";
+    }
+    next();
+  } catch (e) {
+    console.log(e);
+    return res.status(401).send("Unauthorized");
+  }
+}
+
 var app = express();
+
+var rawBodySaver = function (req, res, buf, encoding) {
+  if (buf && buf.length) {
+    req.rawBody = buf.toString(encoding || "utf8");
+  }
+};
+
+app.use(
+  "/app/webhooks/product-update",
+  bodyParser.json({ verify: rawBodySaver })
+);
+
+app.use(
+  "/app/webhooks/app-uninstalled",
+  bodyParser.json({ verify: rawBodySaver })
+);
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -68,7 +103,16 @@ app.get("/shopify/callback", function (req, res) {
       if (err) {
         throw err;
       }
-      subscribeToWebHook(shop)
+      return Promise.all([
+        shopifyService.subscribeToProductUpdateWebhook(
+          shop,
+          forwardingAddress + "/app/webhooks/product-update"
+        ),
+        shopifyService.subscribeToUninstallWebHook(
+          shop,
+          forwardingAddress + "/app/webhooks/app-uninstalled"
+        ),
+      ])
         .then(function () {
           res.redirect(
             "https://" + shop.config.shop + "/admin/apps/" + appConfig.appName
@@ -249,17 +293,16 @@ app.post("/app/butter-cms/collections/page", verifyRequest, function (
   }
 });
 
-app.post("/app/subscription", function (req, res) {
+app.post("/app/webhooks/product-update", verifyWebhookRequest, function (
+  req,
+  res
+) {
   try {
     console.log("Subscription fired!!!", req.body, req.headers);
-    // TODO: add request verification
-    console.log("item", {
-      name: req.body.title,
-      image: req.body.image.src,
-      description: req.body.body_html,
-    });
+
+    var shopName = req.headers["x-shopify-shop-domain"];
     return butterCMSService
-      .addItemToCollection(req.headers["x-shopify-shop-domain"], "products", {
+      .addItemToCollection(shopName, "products", {
         name: req.body.title,
         image: req.body.image.src,
         description: req.body.body_html,
@@ -279,6 +322,23 @@ app.post("/app/subscription", function (req, res) {
   // return res.status(200).send("Great!");
 });
 
+app.post("/app/webhooks/app-uninstalled", verifyWebhookRequest, function (
+  req,
+  res
+) {
+  try {
+    var shopName = req.headers["x-shopify-shop-domain"];
+    shopifyService.uninstall(shopName);
+    butterCMSService.disconnect(shopName);
+    console.log("Successfully deleted all shop data", shopName);
+    res.status(200).send("Successfully deleted all shop data");
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send("Server error");
+  }
+  // return res.status(200).send("Great!");
+});
+
 app.use(express.static(path.join(__dirname, "/dist/app-ui")));
 
 app.get("/*", verifyRequest, function (req, res) {
@@ -289,25 +349,4 @@ app.listen(3000, function () {
   console.log("Example app listening on port 3000!");
 });
 
-function generatePageFromProducts(products) {
-  return products.reduce(function (res, product) {
-    var str =
-      "<h4>" +
-      product.product_name +
-      "<h4>" +
-      "<img src='" +
-      product.product_image +
-      "'/>" +
-      "<p>" +
-      product.product_description +
-      "</p>";
-    return res + str;
-  }, "");
-}
-
-function subscribeToWebHook(shop) {
-  return shopifyService.subscribeToWebHook(
-    shop,
-    forwardingAddress + "/app/subscription/"
-  );
-}
+// TODO: subscribe to delete app event to remove shop from shops in service
