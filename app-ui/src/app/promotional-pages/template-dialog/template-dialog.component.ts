@@ -1,46 +1,49 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
-import { FormGroup, Validators, FormControl } from '@angular/forms';
+import { Component, OnInit, Inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ApiService } from 'src/app/core/api.service';
 
 @Component({
   templateUrl: './template-dialog.component.html',
   styleUrls: ['./template-dialog.component.scss'],
 })
 export class TemplateDialogComponent implements OnInit {
-  form: FormGroup;
-  hasExamples = false;
-  exampleTemplate = `<h1>{{fields.twitter_card.title}}</h1>
-<img style="max=width: 100%" src="{{fields.twitter_card.image}}"/>
-<p>{{fields.twitter_card.Description}}</p>
-<h2>{{fields.product_promo_banner.headline}}</h2>
-<div style="display: flex; flex-wrap: wrap; justify-content: space-between">
-{{#fields.product_promo_banner.product}}
-  <div style="flex:1; padding: 10px">
-    <a href="/collections/all/products/{{name}}">{{name}}</a>
-    <img style="width: 100%" src="{{image}}"/>
-    <p>{{description}}</p>
-  </div>
-{{/fields.product_promo_banner.product}}
-</div>`;
+  errorMessage: string;
+  isSubmitting = false;
 
-  constructor(private dialogRef: MatDialogRef<TemplateDialogComponent>) {}
+  constructor(
+    private dialogRef: MatDialogRef<TemplateDialogComponent>,
+    private snackBar: MatSnackBar,
+    private apiService: ApiService,
+    @Inject(MAT_DIALOG_DATA) private pageData: { slug: string }
+  ) {}
+  ngOnInit() {}
 
-  ngOnInit(): void {
-    this.form = new FormGroup({
-      template: new FormControl('', Validators.required),
-    });
-  }
+  onSubmitForm(template: string) {
+    this.errorMessage = '';
+    this.isSubmitting = true;
+    this.apiService
+      .createPageFromButterCMSPage(this.pageData.slug, template)
+      .subscribe(
+        (res) => {
+          this.isSubmitting = false;
+          this.dialogRef.close();
+          this.snackBar.open(
+            'Page was successfully created. Check your shop pages.',
+            null,
+            { duration: 3000, panelClass: 'notification_success' }
+          );
+          console.log(res);
+        },
+        (error) => {
+          this.errorMessage =
+            error.message && error.message.message
+              ? error.message.message
+              : error.statusText;
+          this.isSubmitting = false;
 
-  get template() {
-    return this.form.get('template');
-  }
-
-  submitForm() {
-    console.log(this.form.value, this.form.valid);
-    if (!this.form.valid) {
-      this.form.markAsTouched();
-      return;
-    }
-    this.dialogRef.close(this.form.value.template);
+          console.log(error);
+        }
+      );
   }
 }

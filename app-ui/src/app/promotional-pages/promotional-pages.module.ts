@@ -16,9 +16,10 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { PromotionalPagesRoutingModule } from './promotional-pages-routing.module';
 import { PromotionalPagesComponent } from './promotional-pages.component';
 import { TemplateDialogComponent } from './template-dialog/template-dialog.component';
+import { TemplateDialogFormComponent } from './template-dialog-form/template-dialog-form.component';
 
 @NgModule({
-  declarations: [PromotionalPagesComponent, TemplateDialogComponent],
+  declarations: [PromotionalPagesComponent, TemplateDialogComponent, TemplateDialogFormComponent],
   imports: [
     CommonModule,
     PromotionalPagesRoutingModule,

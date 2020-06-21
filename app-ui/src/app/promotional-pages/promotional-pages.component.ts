@@ -22,46 +22,17 @@ export class PromotionalPagesComponent implements OnInit {
   }>;
   displayedColumns = ['image', 'title', 'description', 'actions'];
 
-  constructor(
-    private apiService: ApiService,
-    private dialog: MatDialog,
-    private snackBar: MatSnackBar
-  ) {}
+  constructor(private apiService: ApiService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.pages = this.apiService.getPromotionalPages(1);
   }
 
   createPage(page: PromotionalPage) {
-    const dialogRef = this.dialog.open(TemplateDialogComponent, {
+    this.dialog.open(TemplateDialogComponent, {
       width: '800px',
       maxWidth: '80%',
-    });
-    dialogRef.afterClosed().subscribe((template) => {
-      if (!template) {
-        return;
-      }
-      console.log(page);
-      this.apiService
-        .createPageFromButterCMSPage(page.slug, template)
-        .subscribe(
-          (res) => {
-            this.snackBar.open(
-              'Page was successfully created. Check your shop pages.',
-              null,
-              { duration: 3000, panelClass: 'notification_success' }
-            );
-            console.log(res);
-          },
-          (error) => {
-            console.log(error);
-            this.snackBar.open(
-              'Error occurred during page creation. Check your template',
-              null,
-              { duration: 3000, panelClass: 'notification_error' }
-            );
-          }
-        );
+      data: { slug: page.slug },
     });
   }
 }
