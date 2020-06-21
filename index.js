@@ -135,7 +135,7 @@ app.post("/app/butter-cms/config", verifyRequest, function (req, res) {
     if (!writeToken) {
       return res.status(404).send("butterCMSWriteToken is missing");
     }
-    butterCMSService.init(res.locals.shop.config.shop, {
+    butterCMSService.connect(res.locals.shop.config.shop, {
       writeToken: writeToken,
     });
     res
