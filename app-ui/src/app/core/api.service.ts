@@ -9,17 +9,15 @@ import { Collection, PromotionalPage } from '../types';
 })
 export class ApiService {
   private apiUrl = 'app';
+  writeToken: string;
 
   constructor(private http: HttpClient) {}
 
   configApp(config: { butterCMSWriteToken: string }): Observable<void> {
+    this.writeToken = config.butterCMSWriteToken;
     return this.http.post<void>(`${this.apiUrl}/butter-cms/config`, {
       config,
     });
-  }
-
-  getCollections(): Observable<Collection[]> {
-    return this.http.get<Collection[]>(`${this.apiUrl}/collections`);
   }
 
   getPromotionalPages(
@@ -40,12 +38,6 @@ export class ApiService {
       };
       data: PromotionalPage[];
     }>(`${this.apiUrl}/butter-cms/promotional-pages/page/${pageNumber}`);
-  }
-
-  createPageFromCollection(collection: Collection): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/butter-cms/collections/page`, {
-      collectionId: collection.id,
-    });
   }
 
   createPageFromButterCMSPage(

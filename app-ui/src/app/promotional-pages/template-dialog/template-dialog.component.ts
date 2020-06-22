@@ -33,15 +33,13 @@ export class TemplateDialogComponent implements OnInit {
             null,
             { duration: 3000, panelClass: 'notification_success' }
           );
-          console.log(res);
         },
         (error) => {
           this.errorMessage =
-            error.message && error.message.message
-              ? error.message.message
+            error.error && error.error.message
+              ? error.error.message
               : error.statusText;
           this.isSubmitting = false;
-
           console.log(error);
         }
       );

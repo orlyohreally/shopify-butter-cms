@@ -1,27 +1,14 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ConfigFormComponent } from './config/config-form/config-form.component';
+import { ButterCMSConfiguredGuard } from './core/config.guard';
 
 const routes: Routes = [
   { path: 'config', component: ConfigFormComponent },
   {
-    path: 'collections',
-    loadChildren: () =>
-      import('./collections/collections.module').then(
-        (m) => m.CollectionsModule
-      ),
-  },
-  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'config',
-  },
-  {
-    path: 'collections',
-    loadChildren: () =>
-      import('./collections/collections.module').then(
-        (m) => m.CollectionsModule
-      ),
   },
   {
     path: 'promotional-pages',
@@ -29,6 +16,7 @@ const routes: Routes = [
       import('./promotional-pages/promotional-pages.module').then(
         (m) => m.PromotionalPagesModule
       ),
+    canActivate: [ButterCMSConfiguredGuard],
   },
 ];
 

@@ -1,10 +1,5 @@
 <h1 class="mat-h1">Configure ButterCMS</h1>
-<form
-  [formGroup]="form"
-  (ngSubmit)="submitForm()"
-  fxLayout="column"
-  fxLayoutAlign="center center"
->
+<form [formGroup]="form" (ngSubmit)="submitForm()">
   <mat-form-field appearance="outline" class="multi-line-error">
     <mat-label>Write-enabled Token</mat-label>
     <input
@@ -31,12 +26,19 @@
       Token must be 40 characters
     </mat-error>
   </mat-form-field>
-  <div sharedNotificationBlock="error" *ngIf="errorMessage">
-    {{ errorMessage }}
+  <div fxLayout="column" fxLayoutAlign="center center">
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+    <mat-spinner *ngIf="submittingForm" [diameter]="30" color="primary">
+    </mat-spinner>
+    <button
+      mat-raised-button
+      class="button_submit"
+      color="accent"
+      type="submit"
+    >
+      Save
+    </button>
   </div>
-  <mat-spinner *ngIf="submittingForm" [diameter]="30" color="primary">
-  </mat-spinner>
-  <button mat-raised-button class="button" color="accent" type="submit">
-    Save
-  </button>
 </form>

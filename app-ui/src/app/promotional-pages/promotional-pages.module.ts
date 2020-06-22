@@ -11,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ClipboardModule } from '@angular/cdk/clipboard';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 import { PromotionalPagesRoutingModule } from './promotional-pages-routing.module';
 import { PromotionalPagesComponent } from './promotional-pages.component';
@@ -19,7 +19,11 @@ import { TemplateDialogComponent } from './template-dialog/template-dialog.compo
 import { TemplateDialogFormComponent } from './template-dialog-form/template-dialog-form.component';
 
 @NgModule({
-  declarations: [PromotionalPagesComponent, TemplateDialogComponent, TemplateDialogFormComponent],
+  declarations: [
+    PromotionalPagesComponent,
+    TemplateDialogComponent,
+    TemplateDialogFormComponent,
+  ],
   imports: [
     CommonModule,
     PromotionalPagesRoutingModule,

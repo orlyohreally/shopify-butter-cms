@@ -11,6 +11,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfigModule } from './config/config.module';
 import { UrlQueryInterceptor } from './core/url-query.interceptor';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,10 +22,12 @@ import { MatIconModule } from '@angular/material/icon';
     AppRoutingModule,
     MatSidenavModule,
     BrowserAnimationsModule,
+    FlexLayoutModule,
     MatIconModule,
     MatToolbarModule,
     MatListModule,
     ConfigModule,
+    MatSnackBarModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: UrlQueryInterceptor, multi: true },

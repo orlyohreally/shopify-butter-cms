@@ -16,3 +16,9 @@ body {
 .notification_success {
   background-color: mat-color($primary);
 }
+
+.error-message {
+  margin: 5px 0;
+  color: mat-color($warn);
+  word-break: break-word;
+}

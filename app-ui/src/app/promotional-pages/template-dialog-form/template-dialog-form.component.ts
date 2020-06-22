@@ -43,7 +43,6 @@ export class TemplateDialogFormComponent implements OnInit {
   }
 
   submitForm() {
-    console.log(this.form.value, this.form.valid);
     if (!this.form.valid) {
       this.form.markAsTouched();
       return;
@@ -71,10 +70,8 @@ export class TemplateDialogFormComponent implements OnInit {
     const reader = new FileReader();
     reader.onloadend = () => {
       const arrayBuffer = reader.result;
-      console.log(arrayBuffer);
 
       mammoth.extractRawText({ arrayBuffer }).then((resultObject) => {
-        console.log(resultObject.value);
         this.template.setValue(resultObject.value);
       });
     };

@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../core/api.service';
-import { Observable } from 'rxjs';
-import { PromotionalPage } from '../types';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
+
+import { PromotionalPage } from '../types';
 import { TemplateDialogComponent } from './template-dialog/template-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -21,11 +23,21 @@ export class PromotionalPagesComponent implements OnInit {
     data: PromotionalPage[];
   }>;
   displayedColumns = ['image', 'title', 'description', 'actions'];
+  errorMessage: string;
 
   constructor(private apiService: ApiService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
-    this.pages = this.apiService.getPromotionalPages(1);
+    this.pages = this.apiService.getPromotionalPages(1).pipe(
+      catchError((error) => {
+        console.log(error);
+        this.errorMessage =
+          error.message && error.error.message
+            ? error.error.message
+            : error.message;
+        return throwError(error);
+      })
+    );
   }
 
   createPage(page: PromotionalPage) {

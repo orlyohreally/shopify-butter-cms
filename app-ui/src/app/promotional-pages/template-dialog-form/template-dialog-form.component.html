@@ -52,6 +52,7 @@
     <div class="error-message" *ngIf="errorMessage || templateError">
       {{ errorMessage || templateError }}
     </div>
+    <mat-spinner *ngIf="isSubmitting" [diameter]="20"></mat-spinner>
     <button
       mat-raised-button
       class="button_submit"
@@ -60,6 +61,5 @@
     >
       Set template
     </button>
-    <mat-spinner *ngIf="isSubmitting" [diameter]="20"></mat-spinner>
   </div>
 </form>

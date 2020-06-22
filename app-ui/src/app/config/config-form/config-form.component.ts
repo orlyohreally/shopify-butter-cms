@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ApiService } from 'src/app/core/api.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   templateUrl: './config-form.component.html',
@@ -12,11 +13,11 @@ export class ConfigFormComponent implements OnInit {
   errorMessage: string;
   tokenLength = 40;
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private snackbar: MatSnackBar) {}
 
   ngOnInit(): void {
     this.form = new FormGroup({
-      butterCMSWriteToken: new FormControl('', [
+      butterCMSWriteToken: new FormControl(this.apiService.writeToken || '', [
         Validators.required,
         Validators.minLength(this.tokenLength),
         Validators.maxLength(this.tokenLength),
@@ -37,13 +38,19 @@ export class ConfigFormComponent implements OnInit {
     this.errorMessage = '';
     this.apiService.configApp(this.form.value).subscribe(
       () => {
-        console.log('yey');
+        this.snackbar.open('Token has been saved', null, {
+          duration: 3000,
+          panelClass: 'notification_success',
+        });
         this.submittingForm = false;
       },
       (error) => {
         console.log(error);
         this.submittingForm = false;
-        this.errorMessage = 'Server error';
+        this.errorMessage =
+          error.message && error.error.message
+            ? error.error.message
+            : error.message;
       }
     );
   }

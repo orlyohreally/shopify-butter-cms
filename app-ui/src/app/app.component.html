@@ -1,6 +1,8 @@
 <mat-drawer-container>
   <mat-drawer mode="side" opened color="prime">
-    <mat-icon class="icon">store</mat-icon>
+    <div fxLayout="row" fxLayoutAlign="center">
+      <mat-icon class="icon">store</mat-icon>
+    </div>
     <mat-list role="list">
       <mat-list-item role="listitem">
         <a [routerLink]="['/promotional-pages']" queryParamsHandling="preserve">
