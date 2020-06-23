@@ -1,99 +1,83 @@
-var shopifyAuthAPI = require("shopify-node-api");
-var shopifyAPI = require("shopify-api-node");
+const ShopifyAuthAPI = require("shopify-node-api");
+const ShopifyAPI = require("shopify-api-node");
 
-var ShopifyService = {
-  shops: {},
-  install: function (shopOptions) {
-    var shop = this.shops[shopOptions.shop];
+class ShopifyService {
+  constructor() {
+    this.shops = {};
+  }
+
+  install(shopOptions) {
+    let shop = this.shops[shopOptions.shop];
 
     if (!shop) {
-      shop = new shopifyAuthAPI({
+      shop = new ShopifyAuthAPI({
         shop: shopOptions.shop,
         shopify_api_key: shopOptions.shopify_api_key,
         shopify_shared_secret: shopOptions.shopify_shared_secret,
         shopify_scope: shopOptions.shopify_scope,
         redirect_uri: shopOptions.redirect_uri,
-        nonce: "",
-        verbose: false,
+        nonce: shopOptions.nonce,
+        verbose: false
       });
       this.shops[shopOptions.shop] = shop;
     }
 
     return shop;
-  },
-  uninstall: function (shopName) {
+  }
+
+  uninstall(shopName) {
     delete this.shops[shopName];
-  },
-  getShop: function (shopName) {
+  }
+
+  getShop(shopName) {
     return this.shops[shopName];
-  },
-  getCollections: function (shop) {
-    var shopify = new shopifyAPI({
-      shopName: shop.config.shop,
-      accessToken: shop.config.access_token,
-    });
+  }
 
-    return shopify.customCollection.list();
-  },
-  getCollection: function (shop, collectionId) {
-    var shopify = new shopifyAPI({
-      shopName: shop.config.shop,
-      accessToken: shop.config.access_token,
+  static exchangeTemporaryToken(shop, query) {
+    return new Promise((resolve, reject) => {
+      shop.exchange_temporary_token(query, (err, data) => {
+        if (err) {
+          return reject(Error(err));
+        }
+        return resolve(data);
+      });
     });
+  }
 
-    return shopify.customCollection.get(collectionId);
-  },
-  getCollectionProducts: function (shop, collectionId) {
-    var shopify = new shopifyAPI({
+  static subscribeToProductUpdateWebhook(shop, address) {
+    const params = {
+      topic: "products/update",
+      address,
+      format: "json"
+    };
+
+    const shopify = new ShopifyAPI({
       shopName: shop.config.shop,
-      accessToken: shop.config.access_token,
+      accessToken: shop.config.access_token
     });
+    return shopify.webhook.create(params);
+  }
 
-    return shopify.product.list({ collection_id: collectionId });
-  },
-  getProducts: function (shop) {
-    var shopify = new shopifyAPI({
+  static subscribeToUninstallWebHook(shop, address) {
+    const params = {
+      topic: "app/uninstalled",
+      address,
+      format: "json"
+    };
+    const shopify = new ShopifyAPI({
       shopName: shop.config.shop,
-      accessToken: shop.config.access_token,
+      accessToken: shop.config.access_token
     });
+    return shopify.webhook.create(params);
+  }
 
-    return shopify.product.list();
-  },
-  createPage: function (shop, pageOptions) {
-    var shopify = new shopifyAPI({
+  static createPage(shop, pageOptions) {
+    const shopify = new ShopifyAPI({
       shopName: shop.config.shop,
-      accessToken: shop.config.access_token,
+      accessToken: shop.config.access_token
     });
     return shopify.page.create(pageOptions);
-  },
-  subscribeToProductUpdateWebhook: function (shop, address) {
-    var params = {
-      topic: "products/update",
-      address: address,
-      format: "json",
-    };
+  }
+}
 
-    var shopify = new shopifyAPI({
-      shopName: shop.config.shop,
-      accessToken: shop.config.access_token,
-    });
-    console.log(params);
-    return shopify.webhook.create(params);
-  },
-  subscribeToUninstallWebHook: function (shop, address) {
-    var params = {
-      topic: "app/uninstalled",
-      address: address,
-      format: "json",
-    };
-    console.log("subscribeToUninstallWebHook", { config: shop.config });
-    var shopify = new shopifyAPI({
-      shopName: shop.config.shop,
-      accessToken: shop.config.access_token,
-    });
-    console.log(params);
-    return shopify.webhook.create(params);
-  },
-};
-
-module.exports = ShopifyService;
+module.exports = { ShopifyService };
