@@ -6,7 +6,6 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { PromotionalPage } from '../types';
 import { TemplateDialogComponent } from './template-dialog/template-dialog.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-promotional-pages',
